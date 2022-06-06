@@ -5,15 +5,22 @@ namespace App\Http\Controllers\backEnd;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\backEnd\SmtpEmail;
+use App\Models\backEnd\Message;
+use App\Mail\TestUserMail;
+use Mail;
+use DB;
+
 class SmtpEmailController extends Controller
 {
     public function view(){
+        $data = [];
         $data['allData'] = SmtpEmail::all();
-        return view('backEnd.smtpemail.manage-email',$data);
+        $data['messageData'] = Message::all();
+     
+        $data['emails'] = DB::table('smtp_emails')->get();
+        return view('backEnd.smtpemail.manage-email',['emails'=>DB::table('smtp_emails')->get()],$data);
     }
     public function store(Request $request){
-        
-    
         $data = new SmtpEmail();
         $data->email = $request->email;
         $result = $data->save();
@@ -27,18 +34,15 @@ class SmtpEmailController extends Controller
     public function edit($id){
         $data['editData'] = SmtpEmail::findOrFail($id);
         $data['allData'] = SmtpEmail::all();
+        $data['messageData'] = Message::all();
         return view('backEnd.smtpemail.manage-email',$data);
     }
     public function update(Request $request){
-        
-    	$this->validate($request,[
-    		'email' =>'required|unique:smtp_emails|max:15,title'
-    	]);
         $data = SmtpEmail::findOrFail($request->id);
         $data->email = $request->email;
         $result = $data->save();
         if($result):
-            return redirect()->back()->with('success','Updated sucessfully');
+            return redirect('view-email')->with('success','Updated sucessfully');
         else:
             return redirect()->back()->with('danger','Updated unsucessfully');
         endif;  
@@ -51,6 +55,22 @@ class SmtpEmailController extends Controller
         else:
             return redirect()->back()->with('danger','Deleted unsucessfully');
         endif;  
+    } 
+    public function sendMail(Request $request){  
+
+        $users = SmtpEmail::whereIn('id',$request->ids)->get();
+
+        if ($users->count() > 0) {
+            foreach($users as $key => $value){
+                if (!empty($value->email)) {
+                    $details = [
+                      'subject' => 'Test From KG.com',
+                    ];
+                    Mail::to($value->email)->send(new TestUserMail($details));
+                }
+            }
+        }
+        return response()->json(['done']);
     }
     
 }

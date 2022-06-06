@@ -30,6 +30,7 @@
                             <ul class="nav flex-column">
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('view-designation')}}">Designation Manage</a>
+                                    <a class="nav-link" href="{{route('view-designation')}}">Designation Manage</a>
                                 </li>
                             </ul>
                         </div>
@@ -42,6 +43,7 @@
                             <ul class="nav flex-column">
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{route('view-email')}}">Email Managment</a>
+                                    <a class="nav-link" href="{{route('view-message')}}">Message Managment</a>
                                 </li>
                             </ul>
                         </div>
