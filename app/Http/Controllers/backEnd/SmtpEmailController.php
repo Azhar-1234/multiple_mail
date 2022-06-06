@@ -56,21 +56,27 @@ class SmtpEmailController extends Controller
             return redirect()->back()->with('danger','Deleted unsucessfully');
         endif;  
     } 
+ 
     public function sendMail(Request $request){  
-
-        $users = SmtpEmail::whereIn('id',$request->ids)->get();
-
-        if ($users->count() > 0) {
-            foreach($users as $key => $value){
-                if (!empty($value->email)) {
-                    $details = [
-                      'subject' => 'Test From KG.com',
-                    ];
-                    Mail::to($value->email)->send(new TestUserMail($details));
-                }
+    $users = SmtpEmail::count();
+        
+        if($request->send_email != null && $users != 0){
+        
+            $email = SmtpEmail::all();
+            $email_lists = [];
+            foreach($email as $value){
+                $email_lists[] = $value->email;
             }
+            
+            $emailInfo = array(
+                'message' => $email->data,
+            );
+
+            Mail::send('backEnd.smtpmail.manage-email',$emailInfo, function($message) use($email_lists,$emailInfo) {
+                $message->from('ektechtest@gmail.com', 'EkTech');
+                $message->to($email_lists);
+                $message->subject('New news has been uploaded');
+            });
         }
-        return response()->json(['done']);
     }
-    
 }

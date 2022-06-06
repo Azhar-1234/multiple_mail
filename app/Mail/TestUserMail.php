@@ -16,9 +16,9 @@ class TestUserMail extends Mailable
      *
      * @return void
      */
-    public function __construct($details)
+    public function __construct($emailInfo)
     {
-        $this->details = $name;
+        $this->emailInfo = $name;
     }
 
     /**
